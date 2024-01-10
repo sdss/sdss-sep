@@ -7,8 +7,14 @@ Python and C library for Source Extraction and Photometry
 [![PyPI](https://img.shields.io/pypi/v/sep.svg)](https://pypi.python.org/pypi/sep)
 [![JOSS](http://joss.theoj.org/papers/10.21105/joss.00058/status.svg)](http://dx.doi.org/10.21105/joss.00058)
 
-*"... [it's] an SEP: Somebody Else's Problem."  
+*"... [it's] an SEP: Somebody Else's Problem."
 "Oh, good. I can relax then."*
+
+
+Note on `sdss-sep`
+------------------
+
+This is a forked version of the original `sep` library. The only purpose of the fork is to build and upload versions of `sep` to PyPI for newer versions of Python, mostly for use in SDSS projects.
 
 
 About
@@ -179,7 +185,7 @@ executable built on top of the library. In Source Extractor, background
 estimation, object detection and photometry are deeply integrated into the
 Source Extractor executable. Many changes to the code were necessary in
 order to put the functionality in stand-alone C functions. It's too much
-to ask of the Source Extractor developer to rewrite large parts of the 
+to ask of the Source Extractor developer to rewrite large parts of the
 core of the Source Extractor program with little gain for the executable.
 
 **What sort of changes?**
