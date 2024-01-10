@@ -16,6 +16,8 @@ Note on `sdss-sep`
 
 This is a forked version of the original `sep` library. The only purpose of the fork is to build and upload versions of `sep` to PyPI for newer versions of Python, mostly for use in SDSS projects.
 
+Note that this package does not change the library name, which continues being `sep`, so `sdss-sep` and the standard `sep` should not be installed together.
+
 
 About
 -----
