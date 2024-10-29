@@ -36,7 +36,7 @@ else:
     extensions = [Extension("sep", sourcefiles, include_dirs=include_dirs,
                             depends=headerfiles,
                             define_macros=[("_USE_MATH_DEFINES", "1"),
-                                           ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])]
+                                           ])]
     extensions = cythonize(extensions)
 
 
@@ -61,6 +61,9 @@ setup(name="sdss-sep",
       url="https://github.com/kbarbary/sep",
       author="Kyle Barbary",
       author_email="kylebarbary@gmail.com",
-      python_requires='>=3.5',
-      install_requires=['numpy'],
+      python_requires='>=3.9',
+      install_requires=[
+        "numpy>=1.25,<2; python_version<'3.11'",
+        "numpy>=2.0,<3; python_version<'3.14'",
+      ],
       ext_modules=extensions)
