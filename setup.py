@@ -34,7 +34,9 @@ else:
     headerfiles = glob(os.path.join("src", "*.h"))
     include_dirs = [numpy.get_include(), "src"]
     extensions = [Extension("sep", sourcefiles, include_dirs=include_dirs,
-                            depends=headerfiles, define_macros=[("_USE_MATH_DEFINES", "1")])]
+                            depends=headerfiles,
+                            define_macros=[("_USE_MATH_DEFINES", "1"),
+                                           ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])]
     extensions = cythonize(extensions)
 
 
