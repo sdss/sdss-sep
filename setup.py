@@ -64,6 +64,6 @@ setup(name="sdss-sep",
       python_requires='>=3.9',
       install_requires=[
         "numpy>=1.25,<2; python_version<'3.11'",
-        "numpy>=2.0,<3; python_version<'3.14'",
+        "numpy>=2.0,<3; python_version>='3.11' and python_version<'3.14'",
       ],
       ext_modules=extensions)
