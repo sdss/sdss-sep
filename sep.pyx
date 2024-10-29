@@ -534,7 +534,7 @@ cdef class Background:
         status = sep_bkg_subarray(self.ptr, &buf[0, 0], sep_dtype)
         _assert_ok(status)
 
-    def __array__(self, dtype=None):
+    def __array__(self, dtype=None, copy=None):
         return self.back(dtype=dtype)
 
     def __rsub__(self, np.ndarray data not None):
