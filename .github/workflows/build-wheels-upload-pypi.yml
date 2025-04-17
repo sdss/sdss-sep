@@ -23,7 +23,7 @@ jobs:
     # First the source distribution is done on ubuntu. This is not related
     # to any operating system, so we could do it on the default os.
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: checkout
@@ -137,7 +137,7 @@ jobs:
     # of a tag starting with <v> as version separation. All other jobs run
     # without heading <v>
 
-    runs-on: [ubuntu-latest]
+    runs-on: [ubuntu-24.04]
     needs: [build_wheels, build_sdist]
 
     strategy:
@@ -146,7 +146,7 @@ jobs:
           - 'sdist'
           - 'wheels-windows-latest'
           - 'wheels-macos-latest'
-          - 'wheels-ubuntu-latest'
+          - 'wheels-ubuntu-24.04'
 
     permissions:
       contents: write
