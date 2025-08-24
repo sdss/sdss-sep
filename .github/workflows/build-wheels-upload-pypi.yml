@@ -133,7 +133,7 @@ jobs:
       id-token: write
 
     # upload to PyPI on every tag starting with 'v'
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
 
     steps:
     - uses: actions/setup-python@v5
