@@ -28,20 +28,23 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: install_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
       # For the build, sep needs numpy and cython and we add twine and wheel
       # for better testing and checking.
 
       - name: Install dependencies
-        run: python -m pip install twine numpy wheel cython
+        run: python -m pip install setuptools twine numpy wheel cython build
 
       - name: Build sdist
-        run: python setup.py sdist
+        run: python -m build --sdist
 
       - name: Show files
         run: ls -lh dist
@@ -53,7 +56,7 @@ jobs:
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
-          name: dist-sdist
+          name: dist
           path: dist/*.tar.gz
 
   build_wheels:
@@ -62,10 +65,10 @@ jobs:
     # done with the help of the `cibuildwheel` package.
     #
     # The wheels are built for Windows, Linux and MacOS and the python versions
-    # 3.5 - 3.10.
+    # 3.9 - 3.13.
     #
     # The three operating system could be done in parallel.
-
+    name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
@@ -73,21 +76,17 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.12']
-        os: [windows-latest, macos-latest, ubuntu-24.04]
-        include:
-          - os: ubuntu-24.04
-            cibw_archs: "aarch64"
+        python-version: ["3.12"]
+        os: [windows-latest, macos-latest, ubuntu-24.04, ubuntu-24.04-arm]
 
     steps:
-      - name: setup QEMU
-        if: matrix.cibw_archs == 'aarch64'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
+      - uses: actions/checkout@v4
 
       - name: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -98,21 +97,9 @@ jobs:
         run: python -m pip install cibuildwheel
 
       - name: Build wheels
-        if: matrix.cibw_archs == 'aarch64'
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BUILD: "cp3*"
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
-          CIBW_BUILD_VERBOSITY: 1
-          CIBW_SKIP: '*-musllinux_*'
-          CIBW_ARCHS_LINUX: "aarch64"
-
-      - name: Build wheels
-        if: matrix.cibw_archs != 'aarch64'
-        run: python -m cibuildwheel --output-dir wheelhouse
-        env:
-          CIBW_BUILD: "cp3*"
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_MANYLINUX_I686_IMAGE: manylinux2014
           CIBW_BUILD_VERBOSITY: 1
@@ -126,7 +113,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: dist-wheels-${{ matrix.os }}
+          name: dist-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
   upload_to_pypi:
@@ -137,31 +124,27 @@ jobs:
     # of a tag starting with <v> as version separation. All other jobs run
     # without heading <v>
 
-    runs-on: [ubuntu-24.04]
+    runs-on: [ubuntu-latest]
     needs: [build_wheels, build_sdist]
-
-    strategy:
-      matrix:
-        artifact-suffix:
-          - 'sdist'
-          - 'wheels-windows-latest'
-          - 'wheels-macos-latest'
-          - 'wheels-ubuntu-24.04'
-
+    environment:
+      name: pypi
+      url: https://pypi.org/p/sdss-sep
     permissions:
-      contents: write
       id-token: write
 
-    # upload to PyPI on every tag
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+    # upload to PyPI on every tag starting with 'v'
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
 
     steps:
     - uses: actions/setup-python@v5
 
     - uses: actions/download-artifact@v4
       with:
-        name: dist-${{ matrix.artifact-suffix }}
+        pattern: dist*
+        merge-multiple: true
         path: dist
 
     - name: upload_to_pypi
       uses: pypa/gh-action-pypi-publish@release/v1
+      # with:
+      #   repository-url: https://test.pypi.org/legacy/
